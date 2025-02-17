@@ -1,5 +1,5 @@
 #include <iostream>
-#include "core/Logger.h"
+#include "src/core/Logger.h"
 
 int main() {
     Logger::info("Starting...");
