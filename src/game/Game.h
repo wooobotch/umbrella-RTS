@@ -11,6 +11,7 @@ public:
     void run();
 
 private:
+    GLFWwindow* window;
     bool running;
     void processInput();
     void update();
