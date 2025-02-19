@@ -1,4 +1,3 @@
-```sh
 #!/bin/bash
 echo "Instalando dependencias..."
 sudo apt update && sudo apt install -y \
