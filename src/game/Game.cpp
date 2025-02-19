@@ -55,7 +55,7 @@ void Game::run() {
         update();
 
         render();
-        while(Timer::detDeltaTime() < targetFrameTime){
+        while(Timer::getDeltaTime() < targetFrameTime){
             ;
         }
     }
