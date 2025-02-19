@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "../core/Logger.h"
+#include "../core/Timer.h"
 #define GLFW_KEY_ESCAPE 256
 
 Game::Game() : running(true) {
@@ -35,18 +36,32 @@ void Game::processInput() {
     }
 }
 
+void Game::render() {
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+}
+
 void Game::run() {
+    const float targetFrameTime = 1.0f / 60.0f;
+    Timer::start();
+
     while (running) {
+        float deltaTime = Timer::getDeltaTime();
+
         processInput();
         update();
+
         render();
+        while(Timer::detDeltaTime() < targetFrameTime){
+            ;
+        }
     }
 }
 
 void Game::update() {
-    // General game logic
+    ;// General game logic
 }
 
-void Game::render() {
-    // Basic rendering
-}
