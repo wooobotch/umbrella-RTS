@@ -12,6 +12,7 @@ add_executable(umbrella-RTS main.cpp ${SOURCES})
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(GLEW REQUIRED)
 
 target_include_directories(umbrella-RTS PRIVATE include third_party)
-target_link_libraries(umbrella-RTS glfw OpenGL::GL)
+target_link_libraries(umbrella-RTS glfw OpenGL::GL GLEW)
