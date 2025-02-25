@@ -9,4 +9,4 @@ public:
     virtual void render() {}
 };
 
-#endif /
+#endif
