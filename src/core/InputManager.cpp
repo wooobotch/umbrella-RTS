@@ -1,24 +1,25 @@
 #include "InputManager.h"
+#include "UnitManager.h"
+#include "Utils.h"
 #include <iostream>
 
-void InputManager::processInput(GLFWwindow* window) {
-    // Cerrar la ventana si se presiona la tecla ESC
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
+GLFWwindow* InputManager::window = nullptr;
 
-    // Manejar otros inputs aquí
-//    for (const auto& action : keyBindings) {
-//        if (glfwGetKey(window, action.first) == GLFW_PRESS) {
-//            action.second(); // Ejecutar la acción asociada a la tecla
-//        }
-//    }
+void InputManager::initialize(GLFWwindow* win) {
+    window = win;
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
 }
 
-//void InputManager::bindKey(int key, std::function<void()> action) {
-//    keyBindings[key] = action;
-//}
+// Callback de eventos del mouse
+void InputManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
 
-//void InputManager::unbindKey(int key) {
-//    keyBindings.erase(key);
-//}
+        // Convertir coordenadas de pantalla a mundo
+        glm::vec2 worldPos = Utils::screenToWorld(window, xpos, ypos);
+
+        // Intentar seleccionar una unidad
+        UnitManager::selectUnitAt(worldPos);
+    }
+}

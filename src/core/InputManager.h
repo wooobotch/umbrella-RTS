@@ -2,14 +2,15 @@
 #define INPUT_MANAGER_H
 
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 class InputManager {
 public:
-    static bool isKeyPressed(int key);
-    static bool isMouseButtonPressed(int button);
+    static void initialize(GLFWwindow* window);
+    static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 
 private:
-    void processInput(GLFWwindow* window);
+    static GLFWwindow* window;
 };
 
 #endif
