@@ -1,12 +1,12 @@
 #include <GLFW/glfw3.h>
-#include "ecs/Entity.h"
-#include "ecs/components/PositionComponent.h"
-#include "ecs/components/SelectableComponent.h"
-#include "ecs/components/MovementComponent.h"
-#include "ecs/systems/SelectionSystem.h"
-#include "ecs/systems/RenderSystem.h"
-#include "ecs/systems/MovementSystem.h"
-#include "pathfinding/AStar.h"
+#include "../src/ecs/Entity.h"
+#include "../src/ecs/components/PositionComponent.h"
+#include "../src/ecs/components/SelectableComponent.h"
+#include "../src/ecs/components/MovementComponent.h"
+#include "../src/ecs/systems/SelectionSystem.h"
+#include "../src/ecs/systems/RenderSystem.h"
+#include "../src/ecs/systems/MovementSystem.h"
+#include "../src/pathfinding/AStar.h"
 #include "Utils.h"
 #include <vector>
 

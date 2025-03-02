@@ -1,6 +1,6 @@
 #include <iostream>
 #include "src/core/Logger.h"
-#include "src/game/Game.h"
+#include "src/core/Game.h"
 
 int main() {
     Logger::info("Starting...");

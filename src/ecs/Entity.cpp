@@ -1,5 +1,5 @@
 #include "Entity.h"
-#include "Component.h"
+#include "components/Component.h"
 
 void Entity::addComponent(std::shared_ptr<Component> component) {
     components.push_back(component);
