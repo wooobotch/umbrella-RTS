@@ -1,67 +1,65 @@
-#include "Game.h"
-#include "../core/Logger.h"
-#include "../core/Timer.h"
-#define GLFW_KEY_ESCAPE 256
+#include <GLFW/glfw3.h>
+#include "ecs/Entity.h"
+#include "ecs/components/PositionComponent.h"
+#include "ecs/components/SelectableComponent.h"
+#include "ecs/components/MovementComponent.h"
+#include "ecs/systems/SelectionSystem.h"
+#include "ecs/systems/RenderSystem.h"
+#include "ecs/systems/MovementSystem.h"
+#include "pathfinding/AStar.h"
+#include "Utils.h"
+#include <vector>
 
-Game::Game() : running(true) {
-    if (!glfwInit()) {
-        Logger::error("No se pudo inicializar GLFW.");
-        running = false;
-        return;
-    }
+GLFWwindow* window;
+std::vector<Entity> entities;
 
-    window = glfwCreateWindow(800, 600, "Umbrella RTS", NULL, NULL);
-    if (!window) {
-        Logger::error("No se pudo crear la ventana.");
-        glfwTerminate();
-        running = false;
-        return;
-    }
-    Logger::info("Ventana creada correctamente.");
-}
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        double xpos, ypos;
+        glfwGetCursorPos(window, &xpos, &ypos);
+        glm::vec2 worldPos = Utils::screenToWorld(window, xpos, ypos);
 
-Game::~Game() {
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    Logger::info("Juego terminado.");
-}
+        for (auto& entity : entities) {
+            auto selectable = entity.getComponent<SelectableComponent>();
+            auto move = entity.getComponent<MovementComponent>();
+            auto pos = entity.getComponent<PositionComponent>();
 
-void Game::processInput() {
-    if (glfwWindowShouldClose(window)) {
-        running = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        running = false;
-    }
-}
-
-void Game::render() {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-}
-
-void Game::run() {
-    const float targetFrameTime = 1.0f / 60.0f;
-    Timer::start();
-
-    while (running) {
-        float deltaTime = Timer::getDeltaTime();
-
-        processInput();
-        update();
-
-        render();
-        while(Timer::getDeltaTime() < targetFrameTime){
-            ;
+            if (selectable && selectable->selected && move && pos) {
+                move->path = AStar::findPath(pos->position, worldPos);
+            }
         }
     }
 }
 
-void Game::update() {
-    ;// General game logic
+void initEntities() {
+    Entity e1;
+    e1.addComponent(PositionComponent(-0.5f, 0.5f));
+    e1.addComponent(SelectableComponent());
+    e1.addComponent(MovementComponent(1.5f)); // Velocidad 1.5 unidades/s
+    entities.push_back(e1);
 }
 
+int main() {
+    if (!glfwInit()) return -1;
+    window = glfwCreateWindow(800, 600, "Mata Burros", nullptr, nullptr);
+    if (!window) return -1;
+    glfwMakeContextCurrent(window);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+
+    initEntities();
+    float lastTime = glfwGetTime();
+
+    while (!glfwWindowShouldClose(window)) {
+        float currentTime = glfwGetTime();
+        float deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        MovementSystem::update(entities, deltaTime);
+        RenderSystem::render(entities);
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return 0;
+}

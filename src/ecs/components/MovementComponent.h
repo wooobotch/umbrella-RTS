@@ -1,19 +1,15 @@
 #ifndef MOVEMENT_COMPONENT_H
 #define MOVEMENT_COMPONENT_H
 
-#include "Component.h"
-#include "InputManager.h"
+#include <glm/glm.hpp>
+#include <queue>
 
-class MovementComponent : public Component {
-public:
-    glm::vec2 velocity;
+struct MovementComponent {
+    glm::vec2 targetPosition;
+    std::queue<glm::vec2> path; // Cola de puntos a seguir
+    float speed;
 
-    void update() override {
-        if (InputManager::isKeyPressed(GLFW_KEY_W)) velocity.y = 1.0f;
-        if (InputManager::isKeyPressed(GLFW_KEY_S)) velocity.y = -1.0f;
-        if (InputManager::isKeyPressed(GLFW_KEY_A)) velocity.x = -1.0f;
-        if (InputManager::isKeyPressed(GLFW_KEY_D)) velocity.x = 1.0f;
-    }
+    MovementComponent(float speed = 1.0f) : speed(speed), targetPosition(0.0f, 0.0f) {}
 };
 
 #endif
