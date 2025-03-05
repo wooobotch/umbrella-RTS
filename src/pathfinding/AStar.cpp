@@ -1,56 +1,136 @@
 #include "AStar.h"
 #include <cmath>
+#include <unordered_map>
+#include <set>
+#include <vector>
 
 struct Node {
-    glm::vec2 pos;
+    glm::ivec2 pos;
     float gCost, hCost;
     Node* parent;
-    Node(glm::vec2 p, float g, float h, Node* par) : pos(p), gCost(g), hCost(h), parent(par) {}
+    Node(glm::ivec2 p, float g, float h, Node* par) : pos(p), gCost(g), hCost(h), parent(par) {}
     float fCost() const { return gCost + hCost; }
 };
 
 // Distancia Manhattan
-float heuristic(glm::vec2 a, glm::vec2 b) {
+inline float heuristic(glm::ivec2 a, glm::ivec2 b) {
     return std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
 
-std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal) {
-    std::priority_queue<Node*, std::vector<Node*>,
-        [](const Node* a, const Node* b) { return a->fCost() > b->fCost(); }> openSet;
+// Comparador para `priority_queue`
+struct NodeComparator {
+    bool operator()(const Node* a, const Node* b) const {
+        return a->fCost() > b->fCost();
+    }
+};
 
-    std::unordered_map<int, Node*> allNodes;
-    Node* startNode = new Node(start, 0, heuristic(start, goal), nullptr);
-    openSet.push(startNode);
-    allNodes[start.x * 100 + start.y] = startNode;
+// Para mapear coordenadas a una clave única en `unordered_map`
+inline int hash(glm::ivec2 pos) {
+    return pos.x * 10000 + pos.y;
+}
 
-    while (!openSet.empty()) {
-        Node* current = openSet.top();
-        openSet.pop();
+// Encuentra un camino con A* Bidireccional
+std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, const std::vector<std::vector<int>>& grid) {
+    std::priority_queue<Node*, std::vector<Node*>, NodeComparator> openSetStart, openSetGoal;
+    std::unordered_map<int, Node*> allNodesStart, allNodesGoal;
+    std::unordered_map<int, float> gScoreStart, gScoreGoal;
 
-        if (current->pos == goal) {
-            std::queue<glm::vec2> path;
-            while (current) {
-                path.push(current->pos);
-                current = current->parent;
-            }
-            return path;
-        }
+    glm::ivec2 startPos = glm::ivec2(start), goalPos = glm::ivec2(goal);
+    Node* startNode = new Node(startPos, 0, heuristic(startPos, goalPos), nullptr);
+    Node* goalNode = new Node(goalPos, 0, heuristic(goalPos, startPos), nullptr);
 
-        std::vector<glm::vec2> neighbors = {
-            {current->pos.x + 1, current->pos.y},
-            {current->pos.x - 1, current->pos.y},
-            {current->pos.x, current->pos.y + 1},
-            {current->pos.x, current->pos.y - 1}
-        };
+    openSetStart.push(startNode);
+    openSetGoal.push(goalNode);
+    allNodesStart[hash(startPos)] = startNode;
+    allNodesGoal[hash(goalPos)] = goalNode;
+    gScoreStart[hash(startPos)] = 0;
+    gScoreGoal[hash(goalPos)] = 0;
 
-        for (const auto& neighbor : neighbors) {
-            float gCost = current->gCost + 1;
-            float hCost = heuristic(neighbor, goal);
-            Node* neighborNode = new Node(neighbor, gCost, hCost, current);
-            openSet.push(neighborNode);
-            allNodes[neighbor.x * 100 + neighbor.y] = neighborNode;
-        }
+    while (!openSetStart.empty() && !openSetGoal.empty()) {
+        if (processStep(openSetStart, allNodesStart, allNodesGoal, gScoreStart, grid))
+            return reconstructPath(allNodesStart, allNodesGoal);
+
+        if (processStep(openSetGoal, allNodesGoal, allNodesStart, gScoreGoal, grid))
+            return reconstructPath(allNodesStart, allNodesGoal);
     }
 
     return {};
+}
+
+// Expande nodos en la búsqueda
+bool AStar::processStep(std::priority_queue<Node*, std::vector<Node*>, NodeComparator>& openSet,
+                        std::unordered_map<int, Node*>& allNodes,
+                        std::unordered_map<int, Node*>& otherNodes,
+                        std::unordered_map<int, float>& gScore,
+                        const std::vector<std::vector<int>>& grid) {
+    if (openSet.empty()) return false;
+
+    Node* current = openSet.top();
+    openSet.pop();
+
+    if (otherNodes.find(hash(current->pos)) != otherNodes.end()) {
+        return true;  // Se encontraron ambas búsquedas
+    }
+
+    std::vector<glm::ivec2> directions = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+
+    for (const auto& dir : directions) {
+        glm::ivec2 neighborPos = current->pos + dir;
+        int neighborHash = hash(neighborPos);
+
+        // Verifica si está fuera de los límites o es un obstáculo
+        if (neighborPos.x < 0 || neighborPos.y < 0 ||
+            neighborPos.x >= grid.size() || neighborPos.y >= grid[0].size() ||
+            grid[neighborPos.x][neighborPos.y] == 1) {
+            continue;
+        }
+
+        float tentativeG = current->gCost + 1;
+        if (gScore.find(neighborHash) == gScore.end() || tentativeG < gScore[neighborHash]) {
+            gScore[neighborHash] = tentativeG;
+            Node* neighborNode = new Node(neighborPos, tentativeG, heuristic(neighborPos, current->pos), current);
+            openSet.push(neighborNode);
+            allNodes[neighborHash] = neighborNode;
+        }
+    }
+
+    return false;
+}
+
+// Reconstruye la ruta cuando ambas búsquedas se encuentran
+std::queue<glm::vec2> AStar::reconstructPath(std::unordered_map<int, Node*>& startNodes,
+                                             std::unordered_map<int, Node*>& goalNodes) {
+    std::queue<glm::vec2> path;
+    Node* meetingPoint = nullptr;
+
+    for (auto& [key, node] : startNodes) {
+        if (goalNodes.find(key) != goalNodes.end()) {
+            meetingPoint = node;
+            break;
+        }
+    }
+
+    if (!meetingPoint) return path;
+
+    // Reconstruir camino desde el punto de encuentro al inicio
+    Node* current = meetingPoint;
+    while (current) {
+        path.push(glm::vec2(current->pos));
+        current = current->parent;
+    }
+
+    // Reconstruir camino desde el punto de encuentro al final
+    std::vector<glm::vec2> reversePath;
+    current = goalNodes[hash(meetingPoint->pos)];
+    while (current) {
+        reversePath.push_back(glm::vec2(current->pos));
+        current = current->parent;
+    }
+
+    // Insertar en orden correcto
+    for (auto it = reversePath.rbegin(); it != reversePath.rend(); ++it) {
+        path.push(*it);
+    }
+
+    return path;
 }
