@@ -12,11 +12,6 @@ struct Node {
     float fCost() const { return gCost + hCost; }
 };
 
-// Distancia Manhattan
-inline float heuristic(glm::ivec2 a, glm::ivec2 b) {
-    return std::abs(a.x - b.x) + std::abs(a.y - b.y);
-}
-
 // Comparador para `priority_queue`
 struct NodeComparator {
     bool operator()(const Node* a, const Node* b) const {
@@ -24,13 +19,18 @@ struct NodeComparator {
     }
 };
 
+// Distancia Manhattan
+inline float heuristic(glm::ivec2 a, glm::ivec2 b) {
+    return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+}
+
 // Para mapear coordenadas a una clave única en `unordered_map`
 inline int hash(glm::ivec2 pos) {
     return pos.x * 10000 + pos.y;
 }
 
 // Encuentra un camino con A* Bidireccional
-std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, const std::vector<std::vector<int>>& grid) {
+std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal) {
     std::priority_queue<Node*, std::vector<Node*>, NodeComparator> openSetStart, openSetGoal;
     std::unordered_map<int, Node*> allNodesStart, allNodesGoal;
     std::unordered_map<int, float> gScoreStart, gScoreGoal;
