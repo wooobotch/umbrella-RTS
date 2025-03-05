@@ -1,5 +1,5 @@
-#ifndef A_STAR_H
-#define A_STAR_H
+#ifndef ASTAR_H
+#define ASTAR_H
 
 #include <vector>
 #include <queue>
@@ -8,7 +8,8 @@
 
 class AStar {
 public:
-    static std::queue<glm::vec2> findPath(glm::vec2 start, glm::vec2 goal, const std::vector<std::vector<int>>& grid);
+    std::queue<glm::vec2> findPath(glm::vec2 start, glm::vec2 goal, const std::vector<std::vector<int>>& grid);
+    void setOccupiedPositions(const std::vector<glm::ivec2>& occupied);
 
 private:
     bool processStep(std::priority_queue<Node*, std::vector<Node*>, NodeComparator>& openSet,
@@ -20,6 +21,9 @@ private:
     std::queue<glm::vec2> reconstructPath(std::unordered_map<int, Node*>& startNodes,
                                           std::unordered_map<int, Node*>& goalNodes);
 
+    bool isOccupied(glm::ivec2 pos);
+
+    std::set<int> occupiedPositions;
 };
 
 #endif

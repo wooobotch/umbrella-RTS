@@ -72,7 +72,7 @@ bool AStar::processStep(std::priority_queue<Node*, std::vector<Node*>, NodeCompa
         return true;  // Se encontraron ambas búsquedas
     }
 
-    std::vector<glm::ivec2> directions = {{1,0}, {-1,0}, {0,1}, {0,-1}};
+    std::vector<glm::ivec2> directions = {{1,0}, {-1,0}, {0,1}, {0,-1}, {1,1}, {-1,-1}, {1,-1}, {-1,1}};
 
     for (const auto& dir : directions) {
         glm::ivec2 neighborPos = current->pos + dir;
@@ -81,11 +81,12 @@ bool AStar::processStep(std::priority_queue<Node*, std::vector<Node*>, NodeCompa
         // Verifica si está fuera de los límites o es un obstáculo
         if (neighborPos.x < 0 || neighborPos.y < 0 ||
             neighborPos.x >= grid.size() || neighborPos.y >= grid[0].size() ||
-            grid[neighborPos.x][neighborPos.y] == 1) {
+            grid[neighborPos.x][neighborPos.y] == 1 || isOccupied(neighborPos)) {
             continue;
         }
 
-        float tentativeG = current->gCost + 1;
+        float tentativeG = current->gCost + 1.4f;
+        if (dir.x == 0 || dir.y == 0) tentativeG -= 0.4f;
         if (gScore.find(neighborHash) == gScore.end() || tentativeG < gScore[neighborHash]) {
             gScore[neighborHash] = tentativeG;
             Node* neighborNode = new Node(neighborPos, tentativeG, heuristic(neighborPos, current->pos), current);
