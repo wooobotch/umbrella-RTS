@@ -29,8 +29,18 @@ inline int hash(glm::ivec2 pos) {
     return pos.x * 10000 + pos.y;
 }
 
+AStar::AStar(TileMap* tileMap) : tileMap(tileMap) {}
+
+bool AStar::isWalkable(glm::ivec2 pos, UnitType unitType) {
+    return tileMap->isWalkable(pos, unitType);
+}
+
+float AStar::getMovementCost(glm::ivec2 pos, UnitType unitType) {
+    return tileMap->getMovementCost(pos, unitType);
+}
+
 // Encuentra un camino con A* Bidireccional
-std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal) {
+std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, UnitType unitType) {
     std::priority_queue<Node*, std::vector<Node*>, NodeComparator> openSetStart, openSetGoal;
     std::unordered_map<int, Node*> allNodesStart, allNodesGoal;
     std::unordered_map<int, float> gScoreStart, gScoreGoal;
