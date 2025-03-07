@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Configurar el directorio de salida para binarios
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Incluir directorios
 include_directories(src)
@@ -17,7 +19,8 @@ include_directories(src/pathfinding)
 include_directories(src/rendering)
 
 # Archivos fuente
-set(SOURCES
+#set(SOURCES
+file(GLOB_RECURSE SOURCES
     src/main.cpp
 
     # Núcleo del juego
@@ -36,22 +39,24 @@ set(SOURCES
     src/ecs/Entity.h
 
     # Pathfinding
-    src/pathfinding/Astar.cpp
+    src/pathfinding/AStar.cpp
 
     # Renderizado
     src/rendering/Renderer.cpp
     src/rendering/Sprite.cpp
-    src/rendering/Tilemap.cpp
-    src/renderin/Texture.cpp
-    src/rendering/Shader.cpp
+    src/rendering/TileMap.cpp
+    src/rendering/TextureManager.cpp
+    src/rendering/ShaderProgram.cpp
 )
 
 # Definir el ejecutable
-add_executable(umbrella-RTS ${SOURCES})
+add_executable(umbrella-RTS src/main.cpp ${SOURCES})
 
 # Enlazar bibliotecas necesarias
 find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
+find_package(GLEW REQUIRED)
 
 target_include_directories(umbrella-RTS PRIVATE ${SDL2_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
-target_link_libraries(umbrella-RTS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES})
+target_link_libraries(umbrella-RTS ${SDL2_LIBRARIES} glfw  ${OPENGL_LIBRARIES} GLEW)
