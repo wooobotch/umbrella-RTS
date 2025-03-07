@@ -5,7 +5,7 @@ all: generate_sources cmake_build
 
 generate_sources:
 	@echo "Generando sources.cmake..."
-	./generate_sources.sh
+	bash sourcesGenerator.sh
 
 cmake_build:
 	@echo "Configurando y compilando con CMake..."
