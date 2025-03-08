@@ -1,6 +1,7 @@
 #ifndef ASTAR_H
 #define ASTAR_H
 
+#include "Node.h"
 #include <vector>
 #include <queue>
 #include <unordered_map>

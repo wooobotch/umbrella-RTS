@@ -9,7 +9,7 @@ enum class TileType {
     EMPTY,       // Caminable, referencia o base
     BLOCKED,     // Edificios, recursos, accidentes
     ROAD,        // Camino (movimiento más rápido)
-    WATER        // Intransitable (excepto para barcos)
+    WATER,        // Intransitable (excepto para barcos)
     FOREST,      // Movimiento general más lento
     HILL         // Sólo unidades terrestres
 };

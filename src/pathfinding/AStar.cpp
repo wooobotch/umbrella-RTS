@@ -1,16 +1,9 @@
 #include "AStar.h"
+#include "Node.h"
 #include <cmath>
 #include <unordered_map>
 #include <set>
 #include <vector>
-
-struct Node {
-    glm::ivec2 pos;
-    float gCost, hCost;
-    Node* parent;
-    Node(glm::ivec2 p, float g, float h, Node* par) : pos(p), gCost(g), hCost(h), parent(par) {}
-    float fCost() const { return gCost + hCost; }
-};
 
 // Comparador para `priority_queue`
 struct NodeComparator {
