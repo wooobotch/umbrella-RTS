@@ -2,11 +2,12 @@
 #define ASTAR_H
 
 #include "Node.h"
+#include "../rendering/TileMap.h"
+#include <set>
 #include <vector>
 #include <queue>
 #include <unordered_map>
 #include <glm/glm.hpp>
-#include <../rendering/TileMap.h>
 
 class AStar {
 public:

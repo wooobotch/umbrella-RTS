@@ -13,4 +13,10 @@ struct Node {
     float fCost() const { return gCost + hCost; }
 };
 
+struct NodeComparator {
+    bool operator()(const Node* a, const Node* b) const {
+        return a->fCost() > b->fCost();
+    }
+};
+
 #endif

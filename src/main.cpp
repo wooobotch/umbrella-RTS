@@ -25,7 +25,8 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
             auto pos = entity.getComponent<PositionComponent>();
 
             if (selectable && selectable->selected && move && pos) {
-                move->path = AStar::findPath(pos->position, worldPos);
+                AStar pathfinder;
+                move->path = pathfinder.findPath(pos->position, worldPos, UnitType::INFANTRY);
             }
         }
     }

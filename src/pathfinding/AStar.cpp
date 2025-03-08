@@ -5,13 +5,6 @@
 #include <set>
 #include <vector>
 
-// Comparador para `priority_queue`
-struct NodeComparator {
-    bool operator()(const Node* a, const Node* b) const {
-        return a->fCost() > b->fCost();
-    }
-};
-
 // Distancia Manhattan
 inline float heuristic(glm::ivec2 a, glm::ivec2 b) {
     return std::abs(a.x - b.x) + std::abs(a.y - b.y);
