@@ -1,3 +1,4 @@
+#include "Game.h"
 #include <GLFW/glfw3.h>
 #include "../src/ecs/Entity.h"
 #include "../src/ecs/components/PositionComponent.h"
@@ -10,10 +11,18 @@
 #include "Utils.h"
 #include <vector>
 
-GLFWwindow* window;
-std::vector<Entity> entities;
+Game::Game() : window(nullptr), running(false), tileMap(nullptr), pathfinder(nullptr) {}
 
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+Game::~Game() {
+    if (window) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
+    }
+    delete tileMap;
+    delete pathfinder;
+}
+
+void Game::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
         double xpos, ypos;
         glfwGetCursorPos(window, &xpos, &ypos);
@@ -25,13 +34,13 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
             auto pos = entity.getComponent<PositionComponent>();
 
             if (selectable && selectable->selected && move && pos) {
-                move->path = AStar::findPath(pos->position, worldPos);
+                move->path = pathfinder->findPath(pos->position, worldPos, UnitType::INFANTRY);
             }
         }
     }
 }
 
-void initEntities() {
+void Game::initEntities() {
     Entity e1;
     e1.addComponent(PositionComponent(-0.5f, 0.5f));
     e1.addComponent(SelectableComponent());
@@ -39,14 +48,26 @@ void initEntities() {
     entities.push_back(e1);
 }
 
-int main() {
-    if (!glfwInit()) return -1;
-    window = glfwCreateWindow(800, 600, "Mata Burros", nullptr, nullptr);
-    if (!window) return -1;
-    glfwMakeContextCurrent(window);
-    glfwSetMouseButtonCallback(window, mouseButtonCallback);
-
+void Game::startNewGame() {
+    tileMap = new TileMap();  // Crear un nuevo mapa
+    pathfinder = new AStar(tileMap);  // Inicializar pathfinding con el nuevo mapa
     initEntities();
+}
+
+void Game::run() {
+    if (!glfwInit()) return;
+    window = glfwCreateWindow(800, 600, "Mata Burros", nullptr, nullptr);
+    if (!window) return;
+    glfwMakeContextCurrent(window);
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* w, int b, int a, int m) {
+        Game* game = static_cast<Game*>(glfwGetWindowUserPointer(w));
+        if (game) game->mouseButtonCallback(w, b, a, m);
+    });
+    glfwSetWindowUserPointer(window, this);
+
+    startNewGame(); // Se inicia el juego generando un nuevo mapa
+    running = true;
+
     float lastTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window)) {
@@ -54,12 +75,13 @@ int main() {
         float deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        MovementSystem::update(entities, deltaTime);
-        RenderSystem::render(entities);
+        processInput();
+        update();
+        render();
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glfwTerminate();
-    return 0;
+    running = false;
 }
