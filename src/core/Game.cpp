@@ -56,7 +56,7 @@ void Game::startNewGame() {
 
 void Game::run() {
     if (!glfwInit()) return;
-    window = glfwCreateWindow(800, 600, "Mata Burros", nullptr, nullptr);
+    window = glfwCreateWindow(800, 600, "Umbrella RTS", nullptr, nullptr);
     if (!window) return;
     glfwMakeContextCurrent(window);
     glfwSetMouseButtonCallback(window, [](GLFWwindow* w, int b, int a, int m) {
