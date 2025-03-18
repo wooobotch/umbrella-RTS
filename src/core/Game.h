@@ -2,8 +2,10 @@
 #define GAME_H
 
 #include <GLFW/glfw3.h>
+#include <memory>
 #include "../rendering/TileMap.h"
 #include "../pathfinding/AStar.h"
+#include "SceneManager.h"
 
 class Game {
 public:
@@ -16,13 +18,13 @@ public:
 private:
     GLFWwindow* window;
     bool running;
-    TileMap* tileMap = nullptr; // a inicializar al "comenzar partida"
-    AStar* pathfinder = nullptr; // idem arriba
+    std::unique_ptr<TileMap> tileMap;
+    std::unique_ptr<AStar> pathfinder;
+    SceneManager sceneManager;
 
     void processInput();
-    void update();
+    void update(float deltaTime);
     void render();
 };
 
-#endif // GAME_H
-
+#endif

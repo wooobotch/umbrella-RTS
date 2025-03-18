@@ -1,58 +1,21 @@
-#ifndef SCENEMANAGER_H
-#define SCENEMANAGER_H
+#ifndef SCENE_MANAGER_H
+#define SCENE_MANAGER_H
 
-#include <memory>
-#include <stack>
 #include "Scene.h"
+#include <vector>
+#include <memory>
 
 class SceneManager {
-private:
-    std::stack<std::unique_ptr<Scene>> scenes;
 public:
-    void changeScene(std::unique_ptr<Scene> newScene) {
-        if (!scenes.empty()) {
-            scenes.top()->cleanup();
-            scenes.pop();
-        }
-        scenes.push(std::move(newScene));
-        scenes.top()->init();
-    }
+    void pushScene(std::shared_ptr<Scene> newScene);  // Agregar nueva escena encima
+    void popScene();  // Poppea la escena superior
+    std::shared_ptr<Scene> getCurrentScene();
+    void update(float deltaTime);
+    void render();
+    void handleInput();
 
-    void pushScene(std::unique_ptr<Scene> newScene) {
-        if (!scenes.empty()) {
-            scenes.top()->cleanup();
-        }
-        scenes.push(std::move(newScene));
-        scenes.top()->init();
-    }
-
-    void popScene() {
-        if (!scenes.empty()) {
-            scenes.top()->cleanup();
-            scenes.pop();
-        }
-        if (!scenes.empty()) {
-            scenes.top()->init();
-        }
-    }
-
-    void handleInput() {
-        if (!scenes.empty()) {
-            scenes.top()->handleInput();
-        }
-    }
-
-    void update() {
-        if (!scenes.empty()) {
-            scenes.top()->update();
-        }
-    }
-
-    void render() {
-        if (!scenes.empty()) {
-            scenes.top()->render();
-        }
-    }
+private:
+    std::vector<std::shared_ptr<Scene>> sceneStack;
 };
 
 #endif

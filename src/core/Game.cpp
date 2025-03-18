@@ -1,25 +1,28 @@
 #include "Game.h"
 #include <GLFW/glfw3.h>
-#include "../src/ecs/Entity.h"
-#include "../src/ecs/components/PositionComponent.h"
-#include "../src/ecs/components/SelectableComponent.h"
-#include "../src/ecs/components/MovementComponent.h"
-#include "../src/ecs/systems/SelectionSystem.h"
-#include "../src/ecs/systems/RenderSystem.h"
-#include "../src/ecs/systems/MovementSystem.h"
-#include "../src/pathfinding/AStar.h"
+#include <SDL2/SDL.h>
+#include "../ecs/Entity.h"
+#include "../ecs/components/PositionComponent.h"
+#include "../ecs/components/SelectableComponent.h"
+#include "../ecs/components/MovementComponent.h"
+#include "../ecs/systems/SelectionSystem.h"
+#include "../ecs/systems/RenderSystem.h"
+#include "../ecs/systems/MovementSystem.h"
+#include "../pathfinding/AStar.h"
 #include "Utils.h"
+#include "../scenes/SplashScene.h"
 #include <vector>
+#include <iostream>
 
-Game::Game() : window(nullptr), running(false), tileMap(nullptr), pathfinder(nullptr) {}
+Game::Game() : window(nullptr), running(true) {
+    sceneManager.pushScene(std::make_shared<SplashScene>());
+}
 
 Game::~Game() {
     if (window) {
         glfwDestroyWindow(window);
         glfwTerminate();
     }
-    delete tileMap;
-    delete pathfinder;
 }
 
 void Game::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -49,25 +52,29 @@ void Game::initEntities() {
 }
 
 void Game::startNewGame() {
-    tileMap = new TileMap();  // Crear un nuevo mapa
-    pathfinder = new AStar(tileMap);  // Inicializar pathfinding con el nuevo mapa
+    tileMap = std::make_unique<TileMap>();
+    pathfinder = std::make_unique<AStar>(tileMap.get());  // Pasamos el puntero sin perder propiedad
     initEntities();
 }
 
 void Game::run() {
     if (!glfwInit()) return;
+
     window = glfwCreateWindow(800, 600, "Umbrella RTS", nullptr, nullptr);
     if (!window) return;
+
     glfwMakeContextCurrent(window);
+
     glfwSetMouseButtonCallback(window, [](GLFWwindow* w, int b, int a, int m) {
         Game* game = static_cast<Game*>(glfwGetWindowUserPointer(w));
         if (game) game->mouseButtonCallback(w, b, a, m);
     });
+
     glfwSetWindowUserPointer(window, this);
 
-    startNewGame(); // Se inicia el juego generando un nuevo mapa
-    running = true;
+    sceneManager.pushScene(std::make_shared<SplashScene>());
 
+    running = true;
     float lastTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window)) {
@@ -76,7 +83,7 @@ void Game::run() {
         lastTime = currentTime;
 
         processInput();
-        update();
+        update(deltaTime);
         render();
 
         glfwSwapBuffers(window);
@@ -84,4 +91,17 @@ void Game::run() {
     }
 
     running = false;
+}
+
+void Game::processInput() {
+    sceneManager.handleInput();
+}
+
+void Game::update(float deltaTime) {
+    sceneManager.update(deltaTime);
+}
+
+void Game::render() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    sceneManager.render();
 }
