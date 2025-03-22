@@ -52,7 +52,7 @@ void Game::initEntities() {
 }
 
 void Game::startNewGame() {
-    tileMap = std::make_unique<TileMap>();
+    tileMap = std::make_unique<TileMap>(mapWidth, mapHeight);
     pathfinder = std::make_unique<AStar>(tileMap.get());  // Pasamos el puntero sin perder propiedad
     initEntities();
 }

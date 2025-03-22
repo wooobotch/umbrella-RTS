@@ -6,6 +6,7 @@
 #include "../rendering/TileMap.h"
 #include "../pathfinding/AStar.h"
 #include "SceneManager.h"
+#include "InputManager.h"
 
 class Game {
 public:
@@ -13,11 +14,15 @@ public:
     ~Game();
 
     void run();
+    void initEntities();
     void startNewGame(); // Llamar desde menú
 
 private:
     GLFWwindow* window;
+    int mapWidth = 800;
+    int mapHeight = 800;
     bool running;
+    std::vector<Entity> entities;
     std::unique_ptr<TileMap> tileMap;
     std::unique_ptr<AStar> pathfinder;
     SceneManager sceneManager;
