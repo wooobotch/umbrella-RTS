@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(OpenGL_GL_PREFERENCE "GLVND")
+
 # Incluir directorios
 include_directories(src)
 include_directories(src/core)
