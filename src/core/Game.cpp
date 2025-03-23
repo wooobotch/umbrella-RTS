@@ -1,6 +1,10 @@
 #include "Game.h"
+#include "Utils.h"
+#include "InputManager.h"
 #include <GLFW/glfw3.h>
 #include <SDL2/SDL.h>
+#include <vector>
+#include <iostream>
 #include "../ecs/Entity.h"
 #include "../ecs/components/PositionComponent.h"
 #include "../ecs/components/SelectableComponent.h"
@@ -9,10 +13,7 @@
 #include "../ecs/systems/RenderSystem.h"
 #include "../ecs/systems/MovementSystem.h"
 #include "../pathfinding/AStar.h"
-#include "Utils.h"
 #include "../scenes/SplashScene.h"
-#include <vector>
-#include <iostream>
 
 Game::Game() : window(nullptr), running(true) {
     sceneManager.pushScene(std::make_shared<SplashScene>());
@@ -22,24 +23,6 @@ Game::~Game() {
     if (window) {
         glfwDestroyWindow(window);
         glfwTerminate();
-    }
-}
-
-void Game::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        glm::vec2 worldPos = Utils::screenToWorld(window, xpos, ypos);
-
-        for (auto& entity : entities) {
-            auto selectable = entity.getComponent<SelectableComponent>();
-            auto move = entity.getComponent<MovementComponent>();
-            auto pos = entity.getComponent<PositionComponent>();
-
-            if (selectable && selectable->selected && move && pos) {
-                move->path = pathfinder->findPath(pos->position, worldPos, UnitType::INFANTRY);
-            }
-        }
     }
 }
 
@@ -65,10 +48,7 @@ void Game::run() {
 
     glfwMakeContextCurrent(window);
 
-    glfwSetMouseButtonCallback(window, [](GLFWwindow* w, int b, int a, int m) {
-        Game* game = static_cast<Game*>(glfwGetWindowUserPointer(w));
-        if (game) game->mouseButtonCallback(w, b, a, m);
-    });
+    glfwSetMouseButtonCallback(window, InputManager::mouseButtonCallback);
 
     glfwSetWindowUserPointer(window, this);
 
