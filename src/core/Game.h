@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 #include "../rendering/TileMap.h"
+#include "../ecs/Entity.h"
 #include "../pathfinding/AStar.h"
 #include "SceneManager.h"
 #include "InputManager.h"

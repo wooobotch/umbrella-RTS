@@ -40,10 +40,12 @@ public:
     const Tile& getTile(glm::ivec2 pos) const;
 
     bool isWalkable(glm::ivec2 pos, UnitType unitType) const;
+    bool isOccupied(glm::ivec2 pos) const;
     float getMovementCost(glm::ivec2 pos, UnitType unitType) const;
 
 private:
     int width, height;
+    std::set<glm::ivec2> occupiedPositions;
     std::vector<std::vector<Tile>> tiles;
 };
 

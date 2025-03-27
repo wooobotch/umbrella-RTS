@@ -20,6 +20,10 @@ bool TileMap::isWalkable(glm::ivec2 pos, UnitType unitType) const {
     return tiles[pos.x][pos.y].allowedUnits.count(unitType) > 0;
 }
 
+bool TileMap::isOccupied(glm::ivec2 pos) const {
+    return occupiedTiles.find(pos) != occupiedTiles.end();
+}
+
 float TileMap::getMovementCost(glm::ivec2 pos, UnitType unitType) const {
     if (isWalkable(pos, unitType)) {
         return tiles[pos.x][pos.y].movementCost;

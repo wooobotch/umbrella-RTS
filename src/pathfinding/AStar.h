@@ -27,10 +27,6 @@ private:
 
     std::queue<glm::vec2> reconstructPath(std::unordered_map<int, Node*>& startNodes,
                                           std::unordered_map<int, Node*>& goalNodes);
-
-    bool isOccupied(glm::ivec2 pos);
-
-    std::set<int> occupiedPositions;
 };
 
 #endif

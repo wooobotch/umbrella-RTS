@@ -18,10 +18,12 @@ inline int hash(glm::ivec2 pos) {
 AStar::AStar(TileMap* tileMap) : tileMap(tileMap) {}
 
 bool AStar::isWalkable(glm::ivec2 pos, UnitType unitType) {
+    if (!tileMap) return false;
     return tileMap->isWalkable(pos, unitType);
 }
 
 float AStar::getMovementCost(glm::ivec2 pos, UnitType unitType) {
+    if (!tileMap) return -1.0f;  // Ojo, costo no válido si no hay tileMap
     return tileMap->getMovementCost(pos, unitType);
 }
 
@@ -31,7 +33,7 @@ std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, UnitType 
     std::unordered_map<int, Node*> allNodesStart, allNodesGoal;
     std::unordered_map<int, float> gScoreStart, gScoreGoal;
 
-    glm::ivec2 startPos = glm::ivec2(start), goalPos = glm::ivec2(goal);
+    glm::ivec2 startPos = glm::round(start), goalPos = glm::round(goal);
     Node* startNode = new Node(startPos, 0, heuristic(startPos, goalPos), nullptr);
     Node* goalNode = new Node(goalPos, 0, heuristic(goalPos, startPos), nullptr);
 
@@ -43,10 +45,10 @@ std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, UnitType 
     gScoreGoal[hash(goalPos)] = 0;
 
     while (!openSetStart.empty() && !openSetGoal.empty()) {
-        if (processStep(openSetStart, allNodesStart, allNodesGoal, gScoreStart, grid))
+        if (processStep(openSetStart, allNodesStart, allNodesGoal, gScoreStart))
             return reconstructPath(allNodesStart, allNodesGoal);
 
-        if (processStep(openSetGoal, allNodesGoal, allNodesStart, gScoreGoal, grid))
+        if (processStep(openSetGoal, allNodesGoal, allNodesStart, gScoreGoal))
             return reconstructPath(allNodesStart, allNodesGoal);
     }
 
@@ -57,8 +59,7 @@ std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, UnitType 
 bool AStar::processStep(std::priority_queue<Node*, std::vector<Node*>, NodeComparator>& openSet,
                         std::unordered_map<int, Node*>& allNodes,
                         std::unordered_map<int, Node*>& otherNodes,
-                        std::unordered_map<int, float>& gScore,
-                        const std::vector<std::vector<int>>& grid) {
+                        std::unordered_map<int, float>& gScore) {
     if (openSet.empty()) return false;
 
     Node* current = openSet.top();
@@ -75,14 +76,20 @@ bool AStar::processStep(std::priority_queue<Node*, std::vector<Node*>, NodeCompa
         int neighborHash = hash(neighborPos);
 
         // Verifica si está fuera de los límites o es un obstáculo
-        if (neighborPos.x < 0 || neighborPos.y < 0 ||
-            neighborPos.x >= grid.size() || neighborPos.y >= grid[0].size() ||
-            grid[neighborPos.x][neighborPos.y] == 1 || isOccupied(neighborPos)) {
+        if (!tileMap->isWalkable(neighborPos, unitType)) {
             continue;
         }
 
-        float tentativeG = current->gCost + 1.4f;
-        if (dir.x == 0 || dir.y == 0) tentativeG -= 0.4f;
+        if (tileMap->isOccupied(neighborPos)) {
+            continue;
+        }
+
+        float movementCost = tileMap->getMovementCost(neighborPos, unitType);
+        if (movementCost < 0) {  //Porque es -1 en terreno intransitable
+            continue;
+        }
+        float tentativeG = current->gCost + movementCost;
+
         if (gScore.find(neighborHash) == gScore.end() || tentativeG < gScore[neighborHash]) {
             gScore[neighborHash] = tentativeG;
             Node* neighborNode = new Node(neighborPos, tentativeG, heuristic(neighborPos, current->pos), current);
