@@ -28,11 +28,11 @@ BTW, my first programming language ever was C, then I jumped into C++ because so
 2 + 2 ends up adding what we all know.
 
 Regardless what anyone says, that's the winning combo:
-[X] Portability 
-[X] Easy to read
-[X] Modularity
-[X] Virile
-[X] Phrygian
+⚡ Portability 
+⚡ Easy to read
+⚡ Modularity
+⚡ Virile
+⚡ Phrygian
 
 ## So, what now
 
@@ -55,9 +55,19 @@ build-essential, cmake and git are quite standard; libglfw3-dev, to manage windo
 Then mesa-utils just to test OpenGL.
 
 After installing all that, shoot:
+```
 glxinfo | grep "OpenGL version"
+```
 
 You should get anything but an empty line or an error.
+
+## The making
+
+Copy or rename *Makefile.Base* to *Makefile*, then run `make` in that same directory.
+
+I got two files to manage dependencies in the CMakeList just for the sake of using python but the choice is always yours (go make something similar in perl, please, I'll include it in the repo eventually.)
+
+Give the makefile a chance and read it, it's got the typical `make clean` etc, extend it at will.
 
 ## Further considerations
 
