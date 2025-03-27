@@ -45,10 +45,10 @@ std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, UnitType 
     gScoreGoal[hash(goalPos)] = 0;
 
     while (!openSetStart.empty() && !openSetGoal.empty()) {
-        if (processStep(openSetStart, allNodesStart, allNodesGoal, gScoreStart))
+        if (processStep(openSetStart, allNodesStart, allNodesGoal, gScoreStart, unitType))
             return reconstructPath(allNodesStart, allNodesGoal);
 
-        if (processStep(openSetGoal, allNodesGoal, allNodesStart, gScoreGoal))
+        if (processStep(openSetGoal, allNodesGoal, allNodesStart, gScoreGoal, unitType))
             return reconstructPath(allNodesStart, allNodesGoal);
     }
 

@@ -20,7 +20,8 @@ private:
     bool processStep(std::priority_queue<Node*, std::vector<Node*>, NodeComparator>& openSet,
                      std::unordered_map<int, Node*>& allNodes,
                      std::unordered_map<int, Node*>& otherNodes,
-                     std::unordered_map<int, float>& gScore);
+                     std::unordered_map<int, float>& gScore,
+                     UnitType unitType);
 
     bool isWalkable(glm::ivec2 pos, UnitType unitType);
     float getMovementCost(glm::ivec2 pos, UnitType unitType);

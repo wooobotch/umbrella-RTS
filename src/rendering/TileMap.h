@@ -2,6 +2,7 @@
 #define TILEMAP_H
 
 #include <vector>
+#include <set>
 #include <glm/glm.hpp>
 #include <unordered_set>
 
