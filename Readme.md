@@ -61,6 +61,12 @@ glxinfo | grep "OpenGL version"
 
 You should get anything but an empty line or an error.
 
+## About GLAD
+
+There are a couple of ways to get this header files but I'm sticking to the *official site*.
+
+Here's the [permalink](https://glad.dav1d.de/#language=c&specification=gl&api=gl%3D4.6&api=gles1%3Dnone&api=gles2%3Dnone&api=glsc2%3Dnone&profile=compatibility&loader=on) to the form to get the right thing.
+
 ## The making
 
 Copy or rename *Makefile.Base* to *Makefile*, then run `make` in that same directory.

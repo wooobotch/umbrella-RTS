@@ -17,6 +17,7 @@ include_directories(src/ecs/components)
 include_directories(src/ecs/systems)
 include_directories(src/pathfinding)
 include_directories(src/rendering)
+include_directories(third_party/glad)
 
 # Incluir el archivo generado dinámicamente
 include(sources.cmake)
@@ -29,6 +30,8 @@ find_package(SDL2 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
+
+target_sources(umbrella-RTS PRIVATE third_party/glad/glad.c)
 
 target_include_directories(umbrella-RTS PRIVATE ${SDL2_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
 target_link_libraries(umbrella-RTS ${SDL2_LIBRARIES} glfw ${OPENGL_LIBRARIES} GLEW)

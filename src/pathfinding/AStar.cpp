@@ -59,7 +59,8 @@ std::queue<glm::vec2> AStar::findPath(glm::vec2 start, glm::vec2 goal, UnitType 
 bool AStar::processStep(std::priority_queue<Node*, std::vector<Node*>, NodeComparator>& openSet,
                         std::unordered_map<int, Node*>& allNodes,
                         std::unordered_map<int, Node*>& otherNodes,
-                        std::unordered_map<int, float>& gScore) {
+                        std::unordered_map<int, float>& gScore,
+                        UnitType unitType) {
     if (openSet.empty()) return false;
 
     Node* current = openSet.top();
