@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include <glad/glad.h>
+#include "../../third_party/glad/glad.h"
 #include <iostream>
 
 Renderer::Renderer() {}

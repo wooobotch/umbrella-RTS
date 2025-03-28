@@ -31,7 +31,9 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 
-target_sources(umbrella-RTS PRIVATE third_party/glad/glad.c)
+#target_sources(umbrella-RTS PRIVATE third_party/glad/glad.c)
+add_library(glad STATIC third_party/glad/glad.c)
+
 
 target_include_directories(umbrella-RTS PRIVATE ${SDL2_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS})
-target_link_libraries(umbrella-RTS ${SDL2_LIBRARIES} glfw ${OPENGL_LIBRARIES} GLEW)
+target_link_libraries(umbrella-RTS ${SDL2_LIBRARIES} glfw ${OPENGL_LIBRARIES} GLEW glad)
